@@ -3,8 +3,6 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 
-
-
 const char* ssid     = "Anyone want a cookie?";
 const char* password = "XXXX";
 
@@ -12,7 +10,6 @@ ESP8266WebServer server(80);
 
 IPAddress ip(192, 168, 1, 44);
 IPAddress gateway(192, 168, 1, 254);
-IPAddress dns(192, 168, 1, 254);
 IPAddress subnet(255, 255, 255, 0);
 
 const int relayPin = D1;
@@ -83,21 +80,15 @@ void off() {
 }
 
 void setup() {
- pinMode(relayPin, OUTPUT);
-   digitalWrite(relayPin, LOW);
+  pinMode(relayPin, OUTPUT);
+  digitalWrite(relayPin, LOW);
   delay(1000);
   
   Serial.begin(115200);
   Serial.println();
-   /*
-  Serial.print("Configuring access point...");
- 
-    WiFi.softAP(ssid, password);
-    IPAddress myIP = WiFi.softAPIP();
-    Serial.print("AP IP address: ");
-    Serial.println(myIP);
-  */
- //WiFi.config(ip, dns, gateway, subnet);
+
+  WiFi.config(ip, gateway, subnet);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
@@ -119,9 +110,6 @@ void setup() {
   server.on("/off", off);
   server.begin();
   Serial.println("HTTP server started");
-
-
-
 
 }
 
