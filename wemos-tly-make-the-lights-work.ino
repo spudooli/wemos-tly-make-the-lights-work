@@ -6,7 +6,7 @@
 
 
 const char* ssid     = "Anyone want a cookie?";
-const char* password = "F1shfood";
+const char* password = "XXXX";
 
 ESP8266WebServer server(80);
 
@@ -95,15 +95,8 @@ void setup() {
   
   Serial.begin(57600);
   Serial.println();
-   /*
-  Serial.print("Configuring access point...");
- 
-    WiFi.softAP(ssid, password);
-    IPAddress myIP = WiFi.softAPIP();
-    Serial.print("AP IP address: ");
-    Serial.println(myIP);
-  */
- //WiFi.config(ip, dns, gateway, subnet);
+
+ //WiFi.config(ip,  gateway, subnet);
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
