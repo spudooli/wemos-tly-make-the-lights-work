@@ -6,16 +6,18 @@
 
 
 const char* ssid     = "Anyone want a cookie?";
-const char* password = "XXXX";
+const char* password = "F1shfood";
 
 ESP8266WebServer server(80);
 
 IPAddress ip(192, 168, 1, 44);
 IPAddress gateway(192, 168, 1, 254);
-IPAddress dns(192, 168, 1, 254);
 IPAddress subnet(255, 255, 255, 0);
 
 const int relayPin = D1;
+
+const int ledPin = D4;
+
 void On() {
    Serial.println("on");
   String message = "<html>\n";
@@ -85,9 +87,13 @@ void off() {
 void setup() {
  pinMode(relayPin, OUTPUT);
    digitalWrite(relayPin, LOW);
+
+    pinMode(ledPin, OUTPUT);
+    digitalWrite(ledPin, HIGH);
+   
   delay(1000);
   
-  Serial.begin(115200);
+  Serial.begin(57600);
   Serial.println();
    /*
   Serial.print("Configuring access point...");
@@ -104,7 +110,10 @@ void setup() {
     delay(500);
     Serial.print(".");
   }
-
+  
+  //Turn on the LED because we are WIFI connected
+  digitalWrite(ledPin, LOW);
+  
   Serial.println("");
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
