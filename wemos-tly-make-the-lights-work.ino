@@ -4,6 +4,14 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 
+<<<<<<< HEAD
+=======
+
+
+const char* ssid     = "Anyone want a cookie?";
+const char* password = "XXXX";
+
+>>>>>>> 811bb778afe054b02d7df2628a6785bb27387f9d
 ESP8266WebServer server(80);
 
 IPAddress ip(192, 168, 1, 44);
@@ -84,6 +92,7 @@ void off() {
   server.send(200, "text/html", message);
 }
 
+<<<<<<< HEAD
 
 void setup(){
 
@@ -98,12 +107,28 @@ void setup(){
   delay(100);
   //WiFi.mode(WIFI_STA);
   
+=======
+void setup() {
+ pinMode(relayPin, OUTPUT);
+   digitalWrite(relayPin, LOW);
+
+    pinMode(ledPin, OUTPUT);
+    digitalWrite(ledPin, HIGH);
+   
+  delay(1000);
+  
+  Serial.begin(57600);
+  Serial.println();
+
+ //WiFi.config(ip,  gateway, subnet);
+>>>>>>> 811bb778afe054b02d7df2628a6785bb27387f9d
   WiFi.begin(ssid, password);
   Serial.print("Connecting");
   while (WiFi.status() != WL_CONNECTED) {
       Serial.print(".");
       delay(200);
   }
+<<<<<<< HEAD
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
     Serial.println();
     Serial.println("Fail connecting");
@@ -112,6 +137,15 @@ void setup(){
   }
   Serial.print("   OK  ");
   Serial.print("Module IP: ");
+=======
+  
+  //Turn on the LED because we are WIFI connected
+  digitalWrite(ledPin, LOW);
+  
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+>>>>>>> 811bb778afe054b02d7df2628a6785bb27387f9d
   Serial.println(WiFi.localIP());
   //Turn on the LED because we are WIFI connected
   digitalWrite(ledPin, LOW);
@@ -120,6 +154,13 @@ void setup(){
   server.on("/off", off);
   server.begin();
   Serial.println("HTTP server started");
+<<<<<<< HEAD
+=======
+
+
+
+
+>>>>>>> 811bb778afe054b02d7df2628a6785bb27387f9d
 }
 
 void loop() {
