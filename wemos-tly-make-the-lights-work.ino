@@ -1,18 +1,18 @@
 
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-
-
-
-const char* ssid     = "Anyone want a cookie?";
-const char* password = "XXXX";
 
 ESP8266WebServer server(80);
 
 IPAddress ip(192, 168, 1, 44);
 IPAddress gateway(192, 168, 1, 254);
 IPAddress subnet(255, 255, 255, 0);
+IPAddress DNS(192, 168, 1, 254);
+const char* ssid     = "www.spudooli.com";
+const char* password = "F1shfood";
+
 
 const int relayPin = D1;
 
@@ -84,49 +84,57 @@ void off() {
   server.send(200, "text/html", message);
 }
 
-void setup() {
- pinMode(relayPin, OUTPUT);
-   digitalWrite(relayPin, LOW);
-
-    pinMode(ledPin, OUTPUT);
-    digitalWrite(ledPin, HIGH);
-   
-  delay(1000);
+void makeWIFI(){
+    WiFi.config(ip, gateway, subnet, DNS);
+  delay(100);
+  //WiFi.mode(WIFI_STA);
   
-  Serial.begin(57600);
-  Serial.println();
-
- //WiFi.config(ip,  gateway, subnet);
   WiFi.begin(ssid, password);
-
+  Serial.print("Connecting");
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
+      Serial.print(".");
+      delay(200);
   }
-  
+  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    Serial.println();
+    Serial.println("Fail connecting");
+    delay(5000);
+    ESP.restart();
+  }
+  Serial.print("   OK  ");
+  Serial.print("Module IP: ");
+  Serial.println(WiFi.localIP());
   //Turn on the LED because we are WIFI connected
   digitalWrite(ledPin, LOW);
-  
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-    // print the received signal strength:
-  long rssi = WiFi.RSSI();
-  Serial.print("signal strength (RSSI):");
-  Serial.print(rssi);
-  Serial.println(" dBm");
 
   server.on("/on", On);
   server.on("/off", off);
   server.begin();
   Serial.println("HTTP server started");
+}
 
+void setup(){
 
+  pinMode(relayPin, OUTPUT);
+  digitalWrite(relayPin, LOW);
 
+  pinMode(ledPin, OUTPUT);
+  digitalWrite(ledPin, HIGH);
+ 
+  Serial.begin(115200);
+
+  makeWIFI();
 
 }
 
 void loop() {
-  server.handleClient();
+     if (WiFi.status() != WL_CONNECTED)
+    {
+      digitalWrite(ledPin, LOW);
+      makeWIFI();
+    } else {
+        server.handleClient();
+    }
+
 }
+
