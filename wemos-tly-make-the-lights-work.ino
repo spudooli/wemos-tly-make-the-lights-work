@@ -10,7 +10,7 @@ IPAddress ip(192, 168, 1, 44);
 IPAddress gateway(192, 168, 1, 254);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress DNS(192, 168, 1, 254);
-const char* ssid     = "www.spudooli.com";
+const char* ssid     = "Anyone want a cookie?";
 const char* password = "F1shfood";
 
 
