@@ -6,11 +6,11 @@
 
 ESP8266WebServer server(80);
 
-IPAddress ip(192, 168, 1, 44);
+IPAddress ip(192, 168, 1, 45);
 IPAddress gateway(192, 168, 1, 254);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress DNS(192, 168, 1, 254);
-const char* ssid     = "Anyone want a cookie?";
+const char* ssid     = "www.spudooli.com_IoT";
 const char* password = "F1shfood";
 
 
@@ -85,7 +85,7 @@ void off() {
 }
 
 void makeWIFI(){
-    WiFi.config(ip, gateway, subnet, DNS);
+   // WiFi.config(ip, gateway, subnet, DNS);
   delay(100);
   //WiFi.mode(WIFI_STA);
   

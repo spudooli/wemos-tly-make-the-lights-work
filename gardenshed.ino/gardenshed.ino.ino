@@ -10,11 +10,11 @@ SHT3X sht30(0x45);
 
 ESP8266WebServer server(80);
 
-IPAddress ip(192, 168, 1, 47);
-IPAddress gateway(192, 168, 1, 254);
+IPAddress ip(192, 168, 2, 47);
+IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
-IPAddress DNS(192, 168, 1, 254);
-const char* ssid     = "Anyone want a cookie?";
+IPAddress DNS(1, 1, 1, 1);
+const char* ssid     = "www.spudooli.com_IoT";
 const char* password = "F1shfood";
 
 MLED mled(1); //set intensity=5
@@ -35,7 +35,7 @@ void conditions() {
 }
 
 void makeWIFI(){
-    WiFi.config(ip, gateway, subnet, DNS);
+    //WiFi.config(ip, gateway, subnet, DNS);
   delay(100);
   //WiFi.mode(WIFI_STA);
   

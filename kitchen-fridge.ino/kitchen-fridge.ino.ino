@@ -2,6 +2,7 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 
+
 #include <WEMOS_SHT3X.h>
 
 SHT3X sht30(0x45);
@@ -13,8 +14,9 @@ IPAddress ip(192, 168, 1, 48);
 IPAddress gateway(192, 168, 1, 254);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress DNS(192, 168, 1, 254);
-const char* ssid     = "www.spudooli.com";
+const char* ssid     = "www.spudooli.com_IoT";
 const char* password = "F1shfood";
+
 
 int dooropencount = 0;
 
@@ -45,9 +47,6 @@ void fridgedoor() {
 }
 
 void makeWIFI(){
-    WiFi.config(ip, gateway, subnet, DNS);
-  delay(100);
-  //WiFi.mode(WIFI_STA);
   
   WiFi.begin(ssid, password);
   Serial.print("Connecting");
@@ -64,15 +63,24 @@ void makeWIFI(){
   Serial.print("   OK  ");
   Serial.print("Module IP: ");
   Serial.println(WiFi.localIP());
+
+  
   
   //Turn on the LED because we are WIFI connected
   digitalWrite(ledPin, LOW);
   
   server.on("/conditions", conditions);
   server.on("/fridgedoor", fridgedoor);
-  
+
   server.begin();
   Serial.println("HTTP server started");
+        digitalWrite(ledPin, HIGH);
+          delay(500);
+          digitalWrite(ledPin, LOW);
+          delay(500);
+          digitalWrite(ledPin, HIGH);
+          delay(500);
+          digitalWrite(ledPin, LOW);
 }
 
 
@@ -82,17 +90,17 @@ void setup(){
   pinMode(REED_PIN, INPUT_PULLUP);
 
   pinMode(ledPin, OUTPUT);
-  digitalWrite(ledPin, HIGH);
+
   Serial.begin(115200);
 
   makeWIFI();
 
+     
 }
 
 void loop() {
      if (WiFi.status() != WL_CONNECTED)
     {
-      digitalWrite(ledPin, LOW);
       makeWIFI();
     } else {
         server.handleClient();
@@ -100,19 +108,23 @@ void loop() {
 
 int fridgedoorstatus = digitalRead(REED_PIN); // Read the state of the switch
   
-  if (fridgedoorstatus == LOW) // If the pin reads low, the door is open.
+  if (fridgedoorstatus == HIGH) // If the pin reads low, the door is open.
   {
     if (ignore == false){
       ignore = true;
       Serial.println("open");
+      digitalWrite(ledPin, HIGH);
       dooropencount = dooropencount + 1;
       Serial.println("Door open count = ");
       Serial.println(dooropencount);
+
+
     }
   }
   else
   {
     Serial.println("closed");
+    digitalWrite(ledPin, LOW);
     ignore = false;
   }
       delay(500);
