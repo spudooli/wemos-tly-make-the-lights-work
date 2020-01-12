@@ -1,7 +1,10 @@
+#include <LOLIN_HP303B.h>
+
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
-#include <WEMOS_SHT3X.h>
 #include "Timer.h"
+
+LOLIN_HP303B HP303B;
 
 #define wifi_ssid "www.spudooli.com_IoT"
 #define wifi_password "F1shfood"
@@ -10,15 +13,14 @@
 #define mqtt_user ""
 #define mqtt_password ""
 
-#define humidity_topic "house/kitchen/sensor/humidity"
-#define temperature_topic "house/kitchen/sensor/temperature"
+#define pressure_topic "house/indoor/sensor/pressure"
+#define temperature_topic "house/indoor/sensor/temperature"
 
-SHT3X sht30(0x45);
 
 Timer t;
 
-WiFiClient espClientKitchen;
-PubSubClient client(espClientKitchen);
+WiFiClient espClientIndoor;
+PubSubClient client(espClientIndoor);
 
 const int REED_PIN = D3; // Pin connected to reed switch
 const int ledPin = D4;
@@ -28,9 +30,7 @@ void setup() {
   Serial.begin(115200);
   setup_wifi();
   client.setServer(mqtt_server, 1883);
-  pinMode(REED_PIN, INPUT_PULLUP);
 
-  pinMode(ledPin, OUTPUT);
   t.every(120000, getConditions);
 }
 
@@ -52,6 +52,8 @@ void setup_wifi() {
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
+
+  HP303B.begin(0x77); // I2C address = 0x77
 }
 
 void reconnect() {
@@ -59,9 +61,9 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect("ESP8266ClientKitchen")) {
+    if (client.connect("ESP8266ClientIndoor")) {
       Serial.println("connected");
-      //client.publish("house", "fridge/connected", true);
+      //client.publish("house", "indoor/connected", true);
 
     } else {
       Serial.print("failed, rc=");
@@ -73,27 +75,30 @@ void reconnect() {
   }
 }
 
-String kitchentemperature = "";
-String kitchenhumidity = "";
-String fridgedooropened = "";
+    int32_t temperature;
+    int32_t pressure;
+    int16_t oversampling = 7;
+    int16_t ret;
+
+
+String indoortemperature = "";
+String indoorpressure = "";
 
 void getConditions() {
   Serial.print("In getConditions");
-  sht30.get();
+  ret = HP303B.measureTempOnce(temperature, oversampling);
 
-  kitchentemperature = String(sht30.cTemp);
-  Serial.print(kitchentemperature);
-  client.publish(temperature_topic, kitchentemperature.c_str(), true);
 
-  kitchenhumidity =  String(sht30.humidity);
-  Serial.print(kitchenhumidity);
-  client.publish(humidity_topic, kitchenhumidity.c_str(), true);
+  indoortemperature = temperature;
+  Serial.print(indoortemperature);
+  client.publish(temperature_topic, indoortemperature.c_str(), true);
 
-}
+  ret = HP303B.measurePressureOnce(pressure, oversampling);
 
-void sendFridgeDoor(){
-  fridgedooropened = "open";
-  client.publish("house/kitchen/sensor/door", fridgedooropened.c_str(), true);
+  indoorpressure =  pressure;
+  Serial.print(indoorpressure);
+  client.publish(pressure_topic, indoorpressure.c_str(), true);
+
 }
 
 void loop() {
@@ -105,22 +110,6 @@ void loop() {
 
   t.update();
   
-  int fridgedoorstatus = digitalRead(REED_PIN); // Read the state of the switch
-  if (fridgedoorstatus == HIGH) // If the pin reads low, the door is open.
-  {
-    if (ignore == false) {
-      ignore = true;
-      Serial.println("open");
-      digitalWrite(ledPin, HIGH);
-      sendFridgeDoor();
-    }
-  }
-  else
-  {
-    Serial.println("closed");
-    digitalWrite(ledPin, LOW);
-    ignore = false;
-  }
-  delay(500);
+    delay(500);
 
   }

@@ -10,17 +10,16 @@
 #define mqtt_user ""
 #define mqtt_password ""
 
-#define humidity_topic "house/kitchen/sensor/humidity"
-#define temperature_topic "house/kitchen/sensor/temperature"
+#define humidity_topic "house/outside/sensor/humidity"
+#define temperature_topic "house/outside/sensor/temperature"
 
 SHT3X sht30(0x45);
 
 Timer t;
 
-WiFiClient espClientKitchen;
-PubSubClient client(espClientKitchen);
+WiFiClient espClientoutside;
+PubSubClient client(espClientoutside);
 
-const int REED_PIN = D3; // Pin connected to reed switch
 const int ledPin = D4;
 bool ignore = false;
 
@@ -28,7 +27,6 @@ void setup() {
   Serial.begin(115200);
   setup_wifi();
   client.setServer(mqtt_server, 1883);
-  pinMode(REED_PIN, INPUT_PULLUP);
 
   pinMode(ledPin, OUTPUT);
   t.every(120000, getConditions);
@@ -59,7 +57,7 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect("ESP8266ClientKitchen")) {
+    if (client.connect("ESP8266Clientoutside")) {
       Serial.println("connected");
       //client.publish("house", "fridge/connected", true);
 
@@ -73,27 +71,21 @@ void reconnect() {
   }
 }
 
-String kitchentemperature = "";
-String kitchenhumidity = "";
-String fridgedooropened = "";
+String outsidetemperature = "";
+String outsidehumidity = "";
 
 void getConditions() {
   Serial.print("In getConditions");
   sht30.get();
 
-  kitchentemperature = String(sht30.cTemp);
-  Serial.print(kitchentemperature);
-  client.publish(temperature_topic, kitchentemperature.c_str(), true);
+  outsidetemperature = String(sht30.cTemp);
+  Serial.print(outsidetemperature);
+  client.publish(temperature_topic, outsidetemperature.c_str(), true);
 
-  kitchenhumidity =  String(sht30.humidity);
-  Serial.print(kitchenhumidity);
-  client.publish(humidity_topic, kitchenhumidity.c_str(), true);
+  outsidehumidity =  String(sht30.humidity);
+  Serial.print(outsidehumidity);
+  client.publish(humidity_topic, outsidehumidity.c_str(), true);
 
-}
-
-void sendFridgeDoor(){
-  fridgedooropened = "open";
-  client.publish("house/kitchen/sensor/door", fridgedooropened.c_str(), true);
 }
 
 void loop() {
@@ -105,22 +97,6 @@ void loop() {
 
   t.update();
   
-  int fridgedoorstatus = digitalRead(REED_PIN); // Read the state of the switch
-  if (fridgedoorstatus == HIGH) // If the pin reads low, the door is open.
-  {
-    if (ignore == false) {
-      ignore = true;
-      Serial.println("open");
-      digitalWrite(ledPin, HIGH);
-      sendFridgeDoor();
-    }
-  }
-  else
-  {
-    Serial.println("closed");
-    digitalWrite(ledPin, LOW);
-    ignore = false;
-  }
-  delay(500);
+    delay(500);
 
   }
