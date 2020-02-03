@@ -8,6 +8,7 @@
 ESP8266WebServer server(80);
 
 #define PIN 6
+const int relayPin = D1;
 
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = pin number (most are valid)
@@ -70,6 +71,20 @@ void leds_on_quarter() {
   }
 }
 
+void  benchleds_on() {
+  String message = "ok";
+  Serial.println("Bench on");
+  digitalWrite(relayPin, HIGH); 
+  server.send(200, "text/html", message);
+}
+
+void  benchleds_off() {
+  String message = "ok";
+  Serial.println("Bench off");
+  digitalWrite(relayPin, LOW); 
+  server.send(200, "text/html", message);
+}
+
 void makeWIFI(){
     //WiFi.config(ip, gateway, subnet, DNS);
   delay(100);
@@ -98,6 +113,9 @@ void makeWIFI(){
   server.on("/leds-off", leds_off);
   server.on("/leds-quarter", leds_on_quarter);
   server.on("/leds-half", leds_on_half);
+
+  server.on("/benchleds-on", benchleds_on);
+  server.on("/benchleds-off", benchleds_off);
   
   server.begin();
   Serial.println("HTTP server started");
@@ -108,8 +126,13 @@ void setup(){
 
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, HIGH);
+  pinMode(relayPin, OUTPUT);
+  digitalWrite(relayPin, LOW);
+  
   Serial.begin(115200);
+  
   pinMode(D6, OUTPUT);
+  
   makeWIFI();
 
   strip.begin();
