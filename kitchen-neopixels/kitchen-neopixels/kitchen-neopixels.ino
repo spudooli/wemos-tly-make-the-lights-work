@@ -38,10 +38,13 @@ void leds_off() {
 void leds_on() {
   leds_off();
   Serial.println("leds on");
+  String colour1 = server.arg("1");
+  String colour2 = server.arg("2");
+  String colour3 = server.arg("3");
   String message = "ok";
   server.send(200, "text/html", message);
   for(int x = 0; x < 106; x = x + 1) {         //change the 4 to a 5, 3, or 2 for other patterns
-    strip.setPixelColor(x,0,0,200);
+    strip.setPixelColor(x,colour1.toInt(),colour2.toInt(),colour3.toInt());
     strip.show();
     delay(10);
   }
@@ -53,7 +56,7 @@ void leds_on_half() {
     String message = "ok";
   server.send(200, "text/html", message);
   for(int x = 0; x < 106; x = x + 2) {         //change the 4 to a 5, 3, or 2 for other patterns
-    strip.setPixelColor(x,0,0,200);
+    strip.setPixelColor(x,0,0,255);
     strip.show();
     delay(10);
   }
@@ -65,7 +68,7 @@ void leds_on_quarter() {
     String message = "ok";
   server.send(200, "text/html", message);
   for(int x = 0; x < 106; x = x + 4) {         //change the 4 to a 5, 3, or 2 for other patterns
-    strip.setPixelColor(x,0,0,200);
+    strip.setPixelColor(x,0,0,255);
     strip.show();
     delay(10);
   }
